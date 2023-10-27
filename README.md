@@ -1,20 +1,36 @@
-# About
+# About this repository
 
-This repository contains experimental features in Spring Batch. Experimental features are not intended to be used in production.
-
+This repository contains experimental features in Spring Batch.
+Experimental features are *not* intended to be used in production.
 They are shared here to be explored by the community and to gather feedback.
+
+**Important note:** The versioning in this repository follows the [semantic versioning specification](https://semver.org/#spec-item-4).
+Public APIs as well as the implementations should not be considered stable and may change at any time :exclamation:
 
 # Enabling experimental features
 
-Experimental features are not released to Maven Central, but they will be available from the Spring Milestones repository soon.
+Experimental features are not released to Maven Central, but they are available from the Spring Milestones repository:
 
-For now, you can build the project and install it in your local Maven repository with the following command:
+```xml
+<repositories>
+    <repository>
+      <id>spring-milestones</id>
+      <name>Spring Milestones</name>
+      <url>https://repo.spring.io/milestone</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+</repositories>
+```
+
+You can also build the project and install it in your local Maven repository with the following command:
 
 ```shell
 $>./mvnw clean install
 ```
 
-The experimental features are based on the latest Spring Batch 5 release, which requires Java 17+.
+The experimental features are based on the latest Spring Batch 5+ release, which requires Java 17+.
 
 To test experimental features, you need to add the following dependency in your project:
 
@@ -22,13 +38,15 @@ To test experimental features, you need to add the following dependency in your 
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-experimental</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.0</version>
 </dependency>
 ```
 
 Depending on the feature you are testing, other dependencies might be required.
 
 # MongoDB as data store for batch meta-data
+
+*Original issue:* https://github.com/spring-projects/spring-batch/issues/877
 
 This feature introduces new implementations of `JobRepository` and `JobExplorer` for MongoDB.
 
@@ -72,4 +90,12 @@ Those can be defined as Spring beans in the application context as described in 
 
 You can find a complete example in the [MongoDBJobRepositoryIntegrationTests](./src/test/java/org/springframework/batch/experimental/core/repository/support/MongoDBJobRepositoryIntegrationTests.java) file.
 
-If you find an issue, please report it on the [issue tracker](https://github.com/spring-projects-experimental/spring-batch-experimental/issues).
+# Contribute
+
+The best way to contribute to this project is by trying out the experimental features and sharing your feedback!
+
+If you find an issue, please report it on the [issue tracker](https://github.com/spring-projects-experimental/spring-batch-experimental/issues). You are welcome to share your feedback on the original issue related to each feature.
+
+# License
+
+[Apache License Version 2.0](./LICENSE.txt).
