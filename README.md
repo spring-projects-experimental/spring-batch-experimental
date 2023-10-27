@@ -52,7 +52,7 @@ Then, add the following dependencies as well:
 ```
 
 After that, you need to create the collections and sequences required by the MongoDB `JobRepository` implementation in your MongoDB server instance.
-Similar to the DDL scripts provided for relational databases, the MongoShell scripts for MongoDB are provided in [schema-drop-mongodb.js](src/main/resources/org/springframework/batch/core/schema-drop-mongodb.js) and [schema-mongodb.js](src/main/resources/org/springframework/batch/core/schema-mongodb.js).
+Similar to the DDL scripts provided for relational databases, the MongoShell scripts for MongoDB are provided in [schema-drop-mongodb.js](src/main/resources/org/springframework/batch/experimental/core/schema-drop-mongodb.js) and [schema-mongodb.js](src/main/resources/org/springframework/batch/experimental/core/schema-mongodb.js).
 
 Finally, you can define the MongoDB-based `JobRepository` and use it in your Spring Batch application as a regular `JobRepository`:
 
