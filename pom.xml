@@ -53,6 +53,7 @@
         <junit-jupiter.version>5.10.0</junit-jupiter.version>
         <spring-test.version>6.0.13</spring-test.version>
         <testcontainers.version>1.19.1</testcontainers.version>
+        <h2.version>2.2.224</h2.version>
         <slf4j.version>2.0.9</slf4j.version>
     </properties>
 
@@ -97,6 +98,12 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>mongodb</artifactId>
             <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

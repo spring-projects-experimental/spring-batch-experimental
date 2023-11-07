@@ -3,6 +3,12 @@
 This repository contains experimental features in Spring Batch.
 Experimental features are *not* intended to be used in production.
 They are shared here to be explored by the community and to gather feedback.
+Please refer to the [Enabling experimental features](#enabling-experimental-features) section for more details about how to enable experimental features.
+
+The currently available experimental features are the following:
+
+* [MongoDB job repository](#mongodb-job-repository)
+* [Composite item reader](#composite-item-reader)
 
 **Important note:** The versioning in this repository follows the [semantic versioning specification](https://semver.org/#spec-item-4).
 Public APIs as well as the implementations should not be considered stable and may change at any time :exclamation:
@@ -44,7 +50,7 @@ To test experimental features, you need to add the following dependency in your 
 
 Depending on the feature you are testing, other dependencies might be required.
 
-# MongoDB as data store for batch meta-data
+# MongoDB job repository
 
 *Original issue:* https://github.com/spring-projects/spring-batch/issues/877
 
@@ -89,6 +95,48 @@ The implementation requires a [MongoTemplate](https://docs.spring.io/spring-data
 Those can be defined as Spring beans in the application context as described in Spring Data MongoDB documentation.
 
 You can find a complete example in the [MongoDBJobRepositoryIntegrationTests](./src/test/java/org/springframework/batch/experimental/core/repository/support/MongoDBJobRepositoryIntegrationTests.java) file.
+
+# Composite item reader
+
+*Original issue:* https://github.com/spring-projects/spring-batch/issues/757
+
+This feature introduces a composite `ItemReader` implementation. Similar to the `CompositeItemProcessor` and `CompositeItemWriter`, the idea is to delegate reading to a list of item readers in order.
+This is useful when there is a requirement to read data having the same format from different sources (files, databases, etc). Here is an example:
+
+```java
+record Person(int id, String name) {}
+
+@Bean
+public FlatFileItemReader<Person> fileItemReader() {
+	return new FlatFileItemReaderBuilder<Person>()
+			.name("fileItemReader")
+			.resource(new ClassPathResource("persons.csv"))
+			.delimited()
+			.names("id", "name")
+			.targetType(Person.class)
+			.build();
+}
+
+@Bean
+public JdbcCursorItemReader<Person> databaseItemReader() {
+	String sql = "select * from persons";
+	return new JdbcCursorItemReaderBuilder<Person>()
+			.name("databaseItemReader")
+			.dataSource(dataSource())
+			.sql(sql)
+			.rowMapper(new DataClassRowMapper<>(Person.class))
+			.build();
+}
+
+@Bean
+public CompositeItemReader<Person> itemReader() {
+	return new CompositeItemReader<>(Arrays.asList(fileItemReader(), databaseItemReader()));
+}
+```
+
+This snippet configures a `CompositeItemReader` with two delegates to read the same data from a flat file and a database table.
+
+You can find a complete example in the [CompositeItemReaderIntegrationTests](./src/test/java/org/springframework/batch/experimental/item/support/CompositeItemReaderIntegrationTests.java) file.
 
 # Contribute
 
