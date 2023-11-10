@@ -26,6 +26,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -70,8 +71,42 @@ public class ChunkOrientedStepIntegrationTests {
 
 		// then
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
+		Assertions.assertEquals(ExitStatus.COMPLETED, stepExecution.getExitStatus());
+		Assertions.assertEquals(2, stepExecution.getReadCount());
+		Assertions.assertEquals(2, stepExecution.getWriteCount());
+		Assertions.assertEquals(2, stepExecution.getCommitCount());
+		Assertions.assertEquals(0, stepExecution.getRollbackCount());
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(context.getBean(DataSource.class));
 		Assertions.assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
+	}
+
+	@Test
+	void testChunkOrientedStepFailure() throws Exception {
+		// given
+		System.setProperty("fail", "true");
+		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class);
+		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		Job job = context.getBean(Job.class);
+
+		// when
+		JobParameters jobParameters = new JobParametersBuilder()
+				.addString("file", "persons1.csv")
+				.toJobParameters();
+		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
+
+		// then
+		Assertions.assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
+		ExitStatus stepExecutionExitStatus = stepExecution.getExitStatus();
+		Assertions.assertEquals(ExitStatus.FAILED.getExitCode(), stepExecutionExitStatus.getExitCode());
+		Assertions.assertTrue(stepExecutionExitStatus.getExitDescription().contains("Unable to process item Person[id=1, name=foo1]"));
+		Assertions.assertEquals(0, stepExecution.getReadCount());
+		Assertions.assertEquals(0, stepExecution.getWriteCount());
+		Assertions.assertEquals(0, stepExecution.getCommitCount());
+		Assertions.assertEquals(1, stepExecution.getRollbackCount());
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(context.getBean(DataSource.class));
+		Assertions.assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
 	}
 
 	@Configuration
@@ -95,7 +130,12 @@ public class ChunkOrientedStepIntegrationTests {
 
 		@Bean
 		public ItemProcessor<Person, Person> itemProcessor() {
-			return item -> new Person(item.id(), item.name().toUpperCase());
+			return item -> {
+				if (System.getProperty("fail") != null) {
+					throw new Exception("Unable to process item " + item);
+				}
+				return new Person(item.id(), item.name().toUpperCase());
+			};
 		}
 
 		@Bean
