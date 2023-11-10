@@ -9,6 +9,7 @@ The currently available experimental features are the following:
 
 * [MongoDB job repository](#mongodb-job-repository)
 * [Composite item reader](#composite-item-reader)
+* [New chunk-oriented step implementation](#new-chunk-oriented-step-implementation)
 
 **Important note:** The versioning in this repository follows the [semantic versioning specification](https://semver.org/#spec-item-4).
 Public APIs as well as the implementations should not be considered stable and may change at any time :exclamation:
@@ -155,6 +156,30 @@ public CompositeItemReader<Person> itemReader() {
 This snippet configures a `CompositeItemReader` with two delegates to read the same data from a flat file and a database table.
 
 You can find a complete example in the [CompositeItemReaderIntegrationTests](./src/test/java/org/springframework/batch/experimental/item/support/CompositeItemReaderIntegrationTests.java) file.
+
+# New chunk-oriented step implementation
+
+*Original issue:* https://github.com/spring-projects/spring-batch/issues/3950
+
+This is not a new feature, but rather a new implementation of the chunk-oriented processing model. The goal is to address
+the problems with the current implementation as explained in [#3950](https://github.com/spring-projects/spring-batch/issues/3950).
+
+The new implementation does **not** address fault-tolerance and concurrency features for the moment. Those will be addressed incrementally
+in future versions. Our main focus for now is correctness, ie simplify the code with minimal to no behavioral changes.
+
+The new implementation is in the `ChunkOrientedStep` class, which can be used as follows:
+
+```java
+@Bean
+public Step chunkOrientedStep(JobRepository jobRepository, JdbcTransactionManager transactionManager,
+                              ItemReader<Person> itemReader, ItemProcessor<Person, Person> itemProcessor, ItemWriter<Person> itemWriter) {
+    return new ChunkOrientedStep<>("step", 2, itemReader, itemProcessor, itemWriter, jobRepository, transactionManager);
+}
+```
+
+The first two parameters are the step name and chunk size. Other parameters are self explanatory.
+Once defined, this step can then be added to a Spring Batch job flow like any other step type.
+You can find a complete example in the [ChunkOrientedStepIntegrationTests](./src/test/java/org/springframework/batch/experimental/core/step/item/ChunkOrientedStepIntegrationTests.java) file.
 
 # Contribute
 
