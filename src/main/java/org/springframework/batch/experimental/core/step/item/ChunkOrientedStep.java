@@ -147,7 +147,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 						status.setRollbackOnly();
 						stepExecution.incrementRollbackCount();
 						chunkListener.onChunkError(e, processedChunk);
-						throw new FatalStepExecutionException("Unable process chunk", e);
+						throw new FatalStepExecutionException("Unable to process chunk", e);
 					}
 				}
 			});
