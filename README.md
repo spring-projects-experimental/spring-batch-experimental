@@ -30,25 +30,43 @@ Experimental features are not released to Maven Central, but they are available 
 </repositories>
 ```
 
-You can also build the project and install it in your local Maven repository with the following command:
+You can also import the latest snapshots from the Spring Snapshots repository:
 
-```shell
-$>./mvnw clean install
+```xml
+<repositories>
+    <repository>
+        <id>spring-snapshots</id>
+        <name>Spring Snapshots</name>
+        <url>https://repo.spring.io/snapshot</url>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+        <releases>
+            <enabled>false</enabled>
+        </releases>
+    </repository>
+</repositories>
 ```
 
-The experimental features are based on the latest Spring Batch 5+ release, which requires Java 17+.
+Experimental features are based on the latest Spring Batch 5+ release, which requires Java 17+.
 
-To test experimental features, you need to add the following dependency in your project:
+To import experimental features in your project, you need to add the following dependency:
 
 ```xml
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-experimental</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 
-Depending on the feature you are testing, other dependencies might be required.
+Depending on the feature you are testing, other dependencies might be required. This will be mentioned in the section describing the feature.
+
+To build the project and install it in your local Maven repository, use the following command:
+
+```shell
+$>./mvnw clean install
+```
 
 # MongoDB job repository
 
