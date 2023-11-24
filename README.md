@@ -12,7 +12,7 @@ The currently available experimental features are the following:
 * [New chunk-oriented step implementation](#new-chunk-oriented-step-implementation)
 
 **Important note:** The versioning in this repository follows the [semantic versioning specification](https://semver.org/#spec-item-4).
-Public APIs as well as the implementations should not be considered stable and may change at any time :exclamation:
+Public APIs should not be considered as stable and may change at any time :exclamation:
 
 # Enabling experimental features
 
@@ -57,7 +57,7 @@ To import experimental features in your project, you need to add the following d
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-experimental</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 
@@ -84,12 +84,12 @@ Then, add the following dependencies as well:
     <dependency>
         <groupId>org.springframework.data</groupId>
         <artifactId>spring-data-mongodb</artifactId>
-        <version>4.1.5</version>
+        <version>4.2.0</version>
     </dependency>
         <dependency>
         <groupId>org.mongodb</groupId>
         <artifactId>mongodb-driver-sync</artifactId>
-        <version>4.9.1</version>
+        <version>4.11.1</version>
     </dependency>
 </dependencies>
 ```
