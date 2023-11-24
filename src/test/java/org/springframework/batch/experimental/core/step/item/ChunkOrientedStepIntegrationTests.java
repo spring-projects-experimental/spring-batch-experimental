@@ -18,6 +18,7 @@ package org.springframework.batch.experimental.core.step.item;
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.batch.core.ExitStatus;
@@ -59,6 +60,7 @@ public class ChunkOrientedStepIntegrationTests {
 	@Test
 	void testChunkOrientedStep() throws Exception {
 		// given
+		System.setProperty("fail", "true");
 		ApplicationContext context = new AnnotationConfigApplicationContext(TestConfiguration.class);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
 		Job job = context.getBean(Job.class);
@@ -73,12 +75,10 @@ public class ChunkOrientedStepIntegrationTests {
 		Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		Assertions.assertEquals(ExitStatus.COMPLETED, stepExecution.getExitStatus());
-		Assertions.assertEquals(2, stepExecution.getReadCount());
-		Assertions.assertEquals(2, stepExecution.getWriteCount());
-		Assertions.assertEquals(2, stepExecution.getCommitCount());
-		Assertions.assertEquals(0, stepExecution.getRollbackCount());
+		Assertions.assertEquals(6, stepExecution.getReadCount());
+		Assertions.assertEquals(6, stepExecution.getWriteCount());
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(context.getBean(DataSource.class));
-		Assertions.assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
+		Assertions.assertEquals(6, JdbcTestUtils.countRowsInTable(jdbcTemplate, "person_target"));
 	}
 
 	@Test
@@ -131,7 +131,7 @@ public class ChunkOrientedStepIntegrationTests {
 		@Bean
 		public ItemProcessor<Person, Person> itemProcessor() {
 			return item -> {
-				if (System.getProperty("fail") != null) {
+				if (System.getProperty("fail") != null && item.id() == 3) {
 					throw new Exception("Unable to process item " + item);
 				}
 				return new Person(item.id(), item.name().toUpperCase());
@@ -151,7 +151,7 @@ public class ChunkOrientedStepIntegrationTests {
 		@Bean
 		public Step chunkOrientedStep(JobRepository jobRepository, JdbcTransactionManager transactionManager,
 									  ItemReader<Person> itemReader, ItemProcessor<Person, Person> itemProcessor, ItemWriter<Person> itemWriter) {
-			return new ChunkOrientedStep<>("step", 2, itemReader, itemProcessor, itemWriter, jobRepository, transactionManager);
+			return new ConcurrentChunkOrientedStep<>("step", 2, itemReader, itemProcessor, itemWriter, jobRepository, transactionManager);
 		}
 
 
