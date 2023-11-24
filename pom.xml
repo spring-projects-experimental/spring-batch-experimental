@@ -5,7 +5,7 @@
     <artifactId>spring-batch-experimental</artifactId>
     <name>Spring Batch Experimental</name>
     <description>Spring Batch Experimental Features</description>
-    <version>0.3.0</version>
+    <version>0.4.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <url>https://github.com/spring-projects-experimental/spring-batch-experimental</url>
 
