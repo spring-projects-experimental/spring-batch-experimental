@@ -10,12 +10,12 @@ import org.springframework.batch.item.Chunk;
  *
  * Notable difference: afterChunk is called inside the transaction, not outside the transaction.
  */
-public interface ChunkListener<O> extends StepListener {
+public interface ChunkListener<I, O> extends StepListener {
 
 	/**
 	 * Callback before the chunk is processed, inside the transaction.
 	 */
-	default void beforeChunk() {
+	default void beforeChunk(Chunk<I> chunk) {
 	}
 
 	/**

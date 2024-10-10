@@ -84,7 +84,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 	 */
 	private final int chunkSize;
 	private final ChunkTracker chunkTracker = new ChunkTracker();
-	private ChunkListener<O> chunkListener = new ChunkListener<>() {};
+	private ChunkListener<I, O> chunkListener = new ChunkListener<>() {};
 
 	/*
 	 * Step state / interruption parameters
@@ -132,8 +132,8 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 					Chunk<I> inputChunk = new Chunk<>();
 					Chunk<O> processedChunk = new Chunk<>();
 					try {
-						chunkListener.beforeChunk();
 						inputChunk = read(contribution);
+						chunkListener.beforeChunk(inputChunk);
 						processedChunk = process(inputChunk, contribution);
 						write(processedChunk, contribution);
 						chunkListener.afterChunk(processedChunk);
@@ -243,7 +243,7 @@ public class ChunkOrientedStep<I, O> extends AbstractStep {
 		this.itemWriteListener = itemWriteListener;
 	}
 
-	public void setChunkListener(ChunkListener<O> chunkListener) {
+	public void setChunkListener(ChunkListener<I, O> chunkListener) {
 		this.chunkListener = chunkListener;
 	}
 
