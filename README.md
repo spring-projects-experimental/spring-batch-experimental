@@ -7,8 +7,6 @@ Please refer to the [Enabling experimental features](#enabling-experimental-feat
 
 The currently available experimental features are the following:
 
-* [MongoDB job repository](#mongodb-job-repository)
-* [Composite item reader](#composite-item-reader)
 * [New chunk-oriented step implementation](#new-chunk-oriented-step-implementation)
 
 **Important note:** The versioning in this repository follows the [semantic versioning specification](https://semver.org/#spec-item-4).
@@ -57,7 +55,7 @@ To import experimental features in your project, you need to add the following d
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-experimental</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
 </dependency>
 ```
 
@@ -68,94 +66,6 @@ To build the project and install it in your local Maven repository, use the foll
 ```shell
 $>./mvnw clean install
 ```
-
-# MongoDB job repository
-
-*Original issue:* https://github.com/spring-projects/spring-batch/issues/877
-
-This feature introduces new implementations of `JobRepository` and `JobExplorer` for MongoDB.
-
-To test this feature, first import the `spring-batch-experimental` jar as described in the [Enabling experimental features](#enabling-experimental-features) section.
-
-Then, add the following dependencies as well:
-
-```xml
-<dependencies>
-    <dependency>
-        <groupId>org.springframework.data</groupId>
-        <artifactId>spring-data-mongodb</artifactId>
-        <version>4.2.0</version>
-    </dependency>
-        <dependency>
-        <groupId>org.mongodb</groupId>
-        <artifactId>mongodb-driver-sync</artifactId>
-        <version>4.11.1</version>
-    </dependency>
-</dependencies>
-```
-
-After that, you need to create the collections and sequences required by the MongoDB `JobRepository` implementation in your MongoDB server instance.
-Similar to the DDL scripts provided for relational databases, the MongoShell scripts for MongoDB are provided in [schema-drop-mongodb.js](src/main/resources/org/springframework/batch/experimental/core/schema-drop-mongodb.js) and [schema-mongodb.js](src/main/resources/org/springframework/batch/experimental/core/schema-mongodb.js).
-
-Finally, you can define the MongoDB-based `JobRepository` and use it in your Spring Batch application as a regular `JobRepository`:
-
-```java
-@Bean
-public JobRepository jobRepository(MongoTemplate mongoTemplate, MongoTransactionManager transactionManager) throws Exception {
-    MongoJobRepositoryFactoryBean jobRepositoryFactoryBean = new MongoJobRepositoryFactoryBean();
-    jobRepositoryFactoryBean.setMongoOperations(mongoTemplate);
-    jobRepositoryFactoryBean.setTransactionManager(transactionManager);
-    jobRepositoryFactoryBean.afterPropertiesSet();
-    return jobRepositoryFactoryBean.getObject();
-}
-```
-
-The implementation requires a [MongoTemplate](https://docs.spring.io/spring-data/mongodb/docs/current/reference/html/#mongo-template) to interact with MongoDB and a [MongoTransactionManager](https://docs.spring.io/spring-data/mongodb/docs/current/reference/html/#mongo.transactions.tx-manager) to drive Spring Batch transactions.
-Those can be defined as Spring beans in the application context as described in Spring Data MongoDB documentation.
-
-You can find a complete example in the [MongoDBJobRepositoryIntegrationTests](./src/test/java/org/springframework/batch/experimental/core/repository/support/MongoDBJobRepositoryIntegrationTests.java) file.
-
-# Composite item reader
-
-*Original issue:* https://github.com/spring-projects/spring-batch/issues/757
-
-This feature introduces a composite `ItemReader` implementation. Similar to the `CompositeItemProcessor` and `CompositeItemWriter`, the idea is to delegate reading to a list of item readers in order.
-This is useful when there is a requirement to read data having the same format from different sources (files, databases, etc). Here is an example:
-
-```java
-record Person(int id, String name) {}
-
-@Bean
-public FlatFileItemReader<Person> fileItemReader() {
-	return new FlatFileItemReaderBuilder<Person>()
-			.name("fileItemReader")
-			.resource(new ClassPathResource("persons.csv"))
-			.delimited()
-			.names("id", "name")
-			.targetType(Person.class)
-			.build();
-}
-
-@Bean
-public JdbcCursorItemReader<Person> databaseItemReader() {
-	String sql = "select * from persons";
-	return new JdbcCursorItemReaderBuilder<Person>()
-			.name("databaseItemReader")
-			.dataSource(dataSource())
-			.sql(sql)
-			.rowMapper(new DataClassRowMapper<>(Person.class))
-			.build();
-}
-
-@Bean
-public CompositeItemReader<Person> itemReader() {
-	return new CompositeItemReader<>(Arrays.asList(fileItemReader(), databaseItemReader()));
-}
-```
-
-This snippet configures a `CompositeItemReader` with two delegates to read the same data from a flat file and a database table.
-
-You can find a complete example in the [CompositeItemReaderIntegrationTests](./src/test/java/org/springframework/batch/experimental/item/support/CompositeItemReaderIntegrationTests.java) file.
 
 # New chunk-oriented step implementation
 
