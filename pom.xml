@@ -45,16 +45,14 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
-        <spring-batch.version>5.1.0</spring-batch.version>
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-        <mongodb-driver-sync.version>4.11.1</mongodb-driver-sync.version>
-        <spring-data-mongodb.version>4.2.0</spring-data-mongodb.version>
+        <spring-batch.version>5.2.1</spring-batch.version>
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
 
-        <junit-jupiter.version>5.10.1</junit-jupiter.version>
-        <spring-test.version>6.1.1</spring-test.version>
-        <testcontainers.version>1.19.3</testcontainers.version>
-        <h2.version>2.2.224</h2.version>
-        <slf4j.version>2.0.9</slf4j.version>
+        <junit-jupiter.version>5.11.4</junit-jupiter.version>
+        <spring-test.version>6.2.1</spring-test.version>
+        <testcontainers.version>1.20.4</testcontainers.version>
+        <h2.version>2.3.232</h2.version>
+        <slf4j.version>2.0.16</slf4j.version>
     </properties>
 
     <dependencies>
@@ -62,18 +60,6 @@
             <groupId>org.springframework.batch</groupId>
             <artifactId>spring-batch-core</artifactId>
             <version>${spring-batch.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-mongodb</artifactId>
-            <version>${spring-data-mongodb.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver-sync</artifactId>
-            <version>${mongodb-driver-sync.version}</version>
-            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -91,12 +77,6 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${testcontainers.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>mongodb</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
