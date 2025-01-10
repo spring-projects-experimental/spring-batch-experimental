@@ -89,7 +89,7 @@ public Step chunkOrientedStep(JobRepository jobRepository, JdbcTransactionManage
 
 The first two parameters are the step name and chunk size. Other parameters are self explanatory.
 Once defined, this step can then be added to a Spring Batch job flow like any other step type.
-You can find a complete example in the [ChunkOrientedStepIntegrationTests](./src/test/java/org/springframework/batch/experimental/core/step/item/ChunkOrientedStepIntegrationTests.java) file.
+You can find a complete example in the [ChunkOrientedStepIntegrationTests](./src/test/java/org/springframework/experimental/batch/core/step/item/ChunkOrientedStepIntegrationTests.java) file.
 
 # Contribute
 
